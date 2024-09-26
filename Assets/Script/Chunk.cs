@@ -14,6 +14,12 @@ public class Chunk : MonoBehaviour
     private int chunkSize = 16;
     private Color gizmoColor;
     
+    
+    public enum Side
+    {
+        TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK
+    }
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -33,14 +39,55 @@ public class Chunk : MonoBehaviour
         return false;
     }
 
-    public void HideVoxel(int x, int y, int z)
+    public void HideVoxel(int x, int y, int z, Vector3 point)
     {
-        //voxels[x, y, z].isActive = false;
-        //vertices.Clear();
-        //triangles.Clear();
-        //uvs.Clear();
-        //GenerateMesh();
-        Debug.Log(vertices.IndexOf(new Vector3(x, y, z)));
+    
+        for (int i = vertices.Count - 1; i >= 0; i--)
+        {
+            if (vertices[i] == new Vector3(x, y, z))
+            {
+                Side hitSide = FindSide(i);
+                if (vertices[i + 2].x < point.x || vertices[i + 2].y < point.y || vertices[i + 2].z < point.z)
+                    continue;
+                //if (hitSide == Side.BACK || hitSide == Side.RIGHT || hitSide == Side.FRONT || hitSide == Side.TOP || hitSide == size)
+                //{
+                //   if(vertices[i + 2].x < point.x || vertices[i + 2].y < point.y || vertices[i + 2].z < point.z)
+                //    continue;
+                //} else
+                //{
+                //    if (vertices[i + 3].x < point.x || vertices[i + 3].y < point.y || vertices[i + 3].z < point.z)
+                //        continue;
+                //}
+                
+                switch(hitSide)
+                {
+                    case Side.BACK:   
+                        voxels[x, y, z].isActive = false;
+                        break;
+                    case Side.RIGHT:
+                        voxels[x - 1, y, z].isActive = false;
+                        break;
+                    case Side.TOP:
+                        voxels[x, y - 1, z].isActive = false;
+                        break;
+                    case Side.BOTTOM:
+                        voxels[x, y, z].isActive = false;
+                        break;
+                    case Side.FRONT:
+                        voxels[x, y, z - 1].isActive = false;
+                        break;
+                    case Side.LEFT:
+                        voxels[x ,y, z].isActive = false;
+                        break;
+                }
+                vertices.Clear();
+                triangles.Clear();
+                uvs.Clear();
+                GenerateMesh();
+                break;
+           
+            }
+        }
     }
     private void InitializeVoxels()
     {
@@ -121,7 +168,7 @@ public class Chunk : MonoBehaviour
             for (int i = 0; i < facesVisible.Length; i++)
             {
                 if (facesVisible[i])
-                    AddFaceData(x, y, z, i); // Method to add mesh data for the visible face
+                    AddFaceData(x, y, z, i, ref voxel); // Method to add mesh data for the visible face
             }
         }
     }
@@ -177,7 +224,7 @@ public class Chunk : MonoBehaviour
     }
 
 
-    private void AddFaceData(int x, int y, int z, int faceIndex)
+    private void AddFaceData(int x, int y, int z, int faceIndex, ref Voxel voxel)
     {
         // Based on faceIndex, determine vertices and triangles
         // Add vertices and triangles for the visible face
@@ -253,11 +300,52 @@ public class Chunk : MonoBehaviour
             uvs.Add(new Vector2(1, 0));
             uvs.Add(new Vector2(1, 0));
             uvs.Add(new Vector2(0, 0));
-
         }
         AddTriangleIndices();
     }
-
+    // back : 1 , right : 1, front : 0 , left : 0 , top : 0 , : bottom : 0
+    // back : 1 0 , right : 1 1 , front : 0 1, left: 0 0 top 1 0 , bottom 0 1
+    private Side FindSide(int index)
+    {
+        if (vertices[index + 2] == new Vector3(vertices[index].x + 1 , vertices[index].y + 1, vertices[index].z))
+        {
+            if (uvs[index] == new Vector2(0, 1))
+            {
+                return Side.FRONT;
+            }else
+            {
+                return Side.BACK;
+            }
+        }
+        else if (vertices[index + 2] == new Vector3(vertices[index].x, vertices[index].y + 1, vertices[index].z + 1))
+        {
+            if (uvs[index] == new Vector2(0,0))
+            {
+                return Side.LEFT;
+            }
+            else
+            {
+                return Side.RIGHT;
+            }
+        }
+        else if (vertices[index + 3] == new Vector3(vertices[index].x, vertices[index].y + 1, vertices[index].z - 1))
+        {
+            return Side.FRONT;
+        }
+        else if (vertices[index + 3] == new Vector3(vertices[index].x, vertices[index].y + 1, vertices[index].z))
+        {
+            return Side.LEFT;
+        }
+        else if (vertices[index + 3] == new Vector3(vertices[index].x, vertices[index].y, vertices[index].z + 1))
+        {
+            return Side.BOTTOM;
+        }
+        else
+        {
+            return Side.TOP;
+        }
+        
+    }
     private void AddTriangleIndices()
     {
         int vertCount = vertices.Count;
@@ -278,6 +366,7 @@ public class Chunk : MonoBehaviour
         IterateVoxels(); // Make sure this processes all voxels
 
         Mesh mesh = new Mesh();
+   
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangles.ToArray();
         mesh.uv = uvs.ToArray();

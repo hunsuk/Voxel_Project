@@ -48,15 +48,11 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(ray, out hit, 5f))
             {
                 Chunk targetChunk = World.Instance.GetChunkAt(hit.transform.position);
-                Debug.Log(hit.point);
                 Vector3 targetPos = new Vector3(hit.point.x - targetChunk.transform.position.x, hit.point.y - targetChunk.transform.position.y, hit.point.z - targetChunk.transform.position.z);
-                targetChunk.HideVoxel((int)Mathf.Abs(targetPos.x), (int)Mathf.Abs(targetPos.y), (int)Mathf.Abs(targetPos.z));
+                Debug.Log(targetPos);
+                targetChunk.HideVoxel((int)Mathf.Abs(targetPos.x), (int)Mathf.Abs(targetPos.y), (int)Mathf.Abs(targetPos.z), targetPos);
             };
         }
-    }
-    float Euclidean(Vector3 p1, Vector3 p2)
-    {
-        return Mathf.Sqrt(Mathf.Pow(p1.x - p2.x, 2) + Mathf.Pow(p1.y - p2.y, 2) + Mathf.Pow(p1.z - p2.z ,2));
     }
     void SetPlayerCenter()
     {
