@@ -13,8 +13,8 @@ public class Chunk : MonoBehaviour
     private Voxel[,,] voxels;
     private int chunkSize = 16;
     private Color gizmoColor;
-    
-    
+
+
     public enum Side
     {
         TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK
@@ -29,15 +29,9 @@ public class Chunk : MonoBehaviour
 
         // Call this to generate the chunk mesh
         GenerateMesh();
+        gameObject.layer = 6;
     }
-    public bool IsActiveVoxel(int x, int y, int z)
-    {
-        if (x < chunkSize && x > 0 && y < chunkSize && y > 0 && z < chunkSize && z > 0)
-        {
-            return IsFaceVisible(x,y,z);      
-        }
-        return false;
-    }
+    
 
     public void HideVoxel(int x, int y, int z, Vector3 point)
     {
@@ -49,15 +43,6 @@ public class Chunk : MonoBehaviour
                 Side hitSide = FindSide(i);
                 if (vertices[i + 2].x < point.x || vertices[i + 2].y < point.y || vertices[i + 2].z < point.z)
                     continue;
-                //if (hitSide == Side.BACK || hitSide == Side.RIGHT || hitSide == Side.FRONT || hitSide == Side.TOP || hitSide == size)
-                //{
-                //   if(vertices[i + 2].x < point.x || vertices[i + 2].y < point.y || vertices[i + 2].z < point.z)
-                //    continue;
-                //} else
-                //{
-                //    if (vertices[i + 3].x < point.x || vertices[i + 3].y < point.y || vertices[i + 3].z < point.z)
-                //        continue;
-                //}
                 
                 switch(hitSide)
                 {
@@ -85,7 +70,6 @@ public class Chunk : MonoBehaviour
                 uvs.Clear();
                 GenerateMesh();
                 break;
-           
             }
         }
     }
@@ -142,7 +126,6 @@ public class Chunk : MonoBehaviour
             }
         }
     }
-
     private void ProcessVoxel(int x, int y, int z)
     {
         // Check if the voxels array is initialized and the indices are within bounds
@@ -179,8 +162,8 @@ public class Chunk : MonoBehaviour
 
         // Check if the neighboring voxel is inactive or out of bounds in the current chunk
         // and also if it's inactive or out of bounds in the world (neighboring chunks)
-        return IsVoxelHiddenInChunk(x, y, z) && IsVoxelHiddenInWorld(globalPos);
-    }
+        return IsVoxelHiddenInChunk(x, y, z) && true;
+    } 
 
     private bool IsVoxelHiddenInChunk(int x, int y, int z)
     {

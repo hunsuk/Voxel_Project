@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     public CharacterController characterController;
     public Transform cameraTransform;
     private Transform playerTransform;
+    private bool toggleActiave = false;
     public float speed = 6.0f;
     public float gravity = -9.81f;
     public float jumpHeight = 2.0f;
@@ -23,6 +24,8 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.C))
+            toggleActiave = !toggleActiave;
       
         // Toggle fly mode
         if (Input.GetKeyDown(KeyCode.F))
@@ -40,12 +43,12 @@ public class PlayerController : MonoBehaviour
             PlayerMove();
         }
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-        Debug.DrawRay(ray.origin, ray.direction * 5f, Color.red);
+        Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red);
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
-            Debug.DrawRay(ray.origin, ray.direction * 5f, Color.red);
-            if (Physics.Raycast(ray, out hit, 5f))
+            Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red);
+            if (Physics.Raycast(ray, out hit, 3f, LayerMask.GetMask("Chunk")))
             {
                 Chunk targetChunk = World.Instance.GetChunkAt(hit.transform.position);
                 Vector3 targetPos = new Vector3(hit.point.x - targetChunk.transform.position.x, hit.point.y - targetChunk.transform.position.y, hit.point.z - targetChunk.transform.position.z);
@@ -99,7 +102,7 @@ public class PlayerController : MonoBehaviour
 
         playerVelocity.y += gravity * Time.deltaTime;
         characterController.Move(playerVelocity * Time.deltaTime);
-        cameraTransform.position = transform.position;
+        cameraTransform.position = new Vector3 (transform.position.x , transform.position.y + 1f, transform.position.z);
         transform.rotation = cameraTransform.rotation;
     }
 
@@ -112,7 +115,7 @@ public class PlayerController : MonoBehaviour
 
         Vector3 flyDirection = cameraTransform.right * x + cameraTransform.up * y + cameraTransform.forward * z;
         transform.position += flyDirection * flySpeed * Time.deltaTime;
-        cameraTransform.position = transform.position;
+        cameraTransform.position = new Vector3(transform.position.x, transform.position.y + 1f, transform.position.z );
         transform.rotation = cameraTransform.rotation;
     }
 
