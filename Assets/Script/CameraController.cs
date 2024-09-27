@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+
     public float turnSpeed = 60.0f;
     public float pitchSensitivity = 2.0f;
     public float yawSensitivity = 2.0f;
@@ -37,6 +38,7 @@ public class CameraController : MonoBehaviour
 
             // Apply the rotation to the camera
             transform.eulerAngles = new Vector3(pitch, yaw, 0.0f);
+            
         }
  
     }

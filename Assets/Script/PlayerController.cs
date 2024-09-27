@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
+
+    public Animator anim;
+    
     public CharacterController characterController;
     public Transform cameraTransform;
     private Transform playerTransform;
     private bool toggleActiave = false;
+    
     public float speed = 6.0f;
     public float gravity = -9.81f;
     public float jumpHeight = 2.0f;
@@ -42,6 +46,11 @@ public class PlayerController : MonoBehaviour
         {
             PlayerMove();
         }
+        SetVoxelSearch();
+    }
+
+    void SetVoxelSearch()
+    {
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
         Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red);
         if (Input.GetMouseButtonDown(0))
@@ -57,6 +66,8 @@ public class PlayerController : MonoBehaviour
             };
         }
     }
+
+
     void SetPlayerCenter()
     {
         // Calculate the center position of the world
@@ -91,6 +102,15 @@ public class PlayerController : MonoBehaviour
         move = cameraTransform.forward * move.z + cameraTransform.right * move.x;
         move.y = 0; // We do not want to move up/down by the camera's forward vector
 
+        if (move.x == 0 && move.y == 0)
+        {
+            anim.SetBool("IsWorking", false);
+        }
+        else
+        {
+            anim.SetBool("IsWorking", true);
+        }
+
         characterController.Move(move * Time.deltaTime * speed);
 
         // Changes the height position of the player..
@@ -103,7 +123,6 @@ public class PlayerController : MonoBehaviour
         playerVelocity.y += gravity * Time.deltaTime;
         characterController.Move(playerVelocity * Time.deltaTime);
         cameraTransform.position = new Vector3 (transform.position.x , transform.position.y + 1f, transform.position.z);
-        transform.rotation = cameraTransform.rotation;
     }
 
     void Fly()
