@@ -56,13 +56,13 @@ public class PlayerController : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
-            Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red);
+            //Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red);
             if (Physics.Raycast(ray, out hit, 3f, LayerMask.GetMask("Chunk")))
             {
                 Chunk targetChunk = World.Instance.GetChunkAt(hit.transform.position);
                 Vector3 targetPos = new Vector3(hit.point.x - targetChunk.transform.position.x, hit.point.y - targetChunk.transform.position.y, hit.point.z - targetChunk.transform.position.z);
                 Debug.Log(targetPos);
-                targetChunk.HideVoxel((int)Mathf.Abs(targetPos.x), (int)Mathf.Abs(targetPos.y), (int)Mathf.Abs(targetPos.z), targetPos);
+                targetChunk.HideVoxel((int)Mathf.Abs(targetPos.x), (int)Mathf.Abs(targetPos.y), (int)Mathf.Abs(targetPos.z), targetPos);    
             };
         }
     }
